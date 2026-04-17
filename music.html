@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music | Raheel Ali · SynthBeatStudio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a0a0f; --surface: #111118; --card: #16161f; --border: #2a2a3a;
+      --cyan: #00e5ff; --violet: #7c3aed; --pink: #f472b6;
+      --text: #e8e8f0; --muted: #6b6b80;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--ink); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 64px; }
+    .nav-logo { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; letter-spacing: 0.1em; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--cyan); }
+    .nav-cta { background: var(--cyan); color: var(--ink); padding: 0.5rem 1.2rem; font-size: 0.7rem; font-family: 'Space Mono', monospace; letter-spacing: 0.1em; text-decoration: none; font-weight: 700; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--text); }
+    .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; flex-direction: column; gap: 1.5rem; z-index: 99; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+
+    .page-hero { padding: 10rem 2rem 5rem; max-width: 1400px; margin: 0 auto; }
+    .page-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+    .page-label::before { content: ''; display: inline-block; width: 2rem; height: 1px; background: var(--cyan); }
+    .page-title { font-family: 'Bebas Neue', cursive; font-size: clamp(4rem, 8vw, 8rem); line-height: 0.9; letter-spacing: 0.02em; }
+    .page-title span { color: var(--cyan); }
+
+    .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 3rem; }
+    .filter-btn {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      border: 1px solid var(--border); color: var(--muted); background: none;
+      padding: 0.5rem 1.2rem; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--cyan); color: var(--cyan); }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem 6rem; }
+    .albums-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .album-card { background: var(--card); border: 1px solid var(--border); cursor: pointer; transition: all 0.3s; overflow: hidden; }
+    .album-card:hover { border-color: var(--cyan); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,229,255,0.08); }
+    .album-cover { aspect-ratio: 1; background: var(--surface); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .album-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .album-placeholder { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .album-placeholder .icon { font-size: 3.5rem; opacity: 0.15; }
+    .album-placeholder p { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+    .album-play-overlay { position: absolute; inset: 0; background: rgba(0,229,255,0.1); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+    .album-card:hover .album-play-overlay { opacity: 1; }
+    .play-circle { width: 64px; height: 64px; border-radius: 50%; background: var(--cyan); display: flex; align-items: center; justify-content: center; }
+    .album-info { padding: 1.5rem; }
+    .album-genre { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--violet); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .album-name { font-family: 'Bebas Neue', cursive; font-size: 1.8rem; letter-spacing: 0.05em; line-height: 1; }
+    .album-meta { display: flex; justify-content: space-between; margin-top: 0.5rem; }
+    .album-year { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+    .album-tracks-count { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+    .album-desc { color: var(--muted); font-size: 0.85rem; margin-top: 0.75rem; line-height: 1.5; }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.88); backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 2rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--border); max-width: 860px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.5rem; z-index: 10; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+    .modal-close:hover { color: var(--text); }
+    .modal-header { padding: 2rem; display: grid; grid-template-columns: 140px 1fr; gap: 2rem; border-bottom: 1px solid var(--border); }
+    .modal-cover-box { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .modal-body { padding: 2rem; }
+    .tracks-header { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--cyan); text-transform: uppercase; margin-bottom: 1rem; }
+    .track-row { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    .track-row:hover { background: rgba(0,229,255,0.03); }
+    .track-num { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); width: 2rem; text-align: right; }
+    .track-title { font-size: 0.95rem; margin-left: 1rem; flex: 1; }
+    .track-dur { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--ink); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    footer { background: var(--surface); border-top: 1px solid var(--border); padding: 3rem 2rem; text-align: center; }
+    .footer-logo { font-family: 'Bebas Neue', cursive; font-size: 2rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+    .footer-logo span { color: var(--cyan); }
+    .footer-sub { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 2rem; }
+    .footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .footer-links a { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--cyan); }
+    .footer-copy { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--border); }
+
+    @media (max-width: 900px) { .nav-links { display: none; } .hamburger { display: flex; } .modal-header { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .modal-cover-box { display: none; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span>S</span>ynth<span>B</span>eat<span>S</span>tudio</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="music.html" class="active">Music</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a><a href="music.html">Music</a>
+  <a href="gallery.html">Gallery</a><a href="about.html">About</a><a href="contact.html">Contact</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-label">Discography</div>
+  <h1 class="page-title">THE<br><span>MUSIC</span></h1>
+</div>
+
+<div class="container">
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="filterAlbums('all', this)">All</button>
+  </div>
+  <div class="albums-grid" id="albumsGrid"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="albumModal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('albumModal').classList.remove('open')">✕</button>
+    <div class="modal-header">
+      <div class="modal-cover-box" id="modalCover">🎵</div>
+      <div>
+        <div id="modalGenre" style="font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--violet);text-transform:uppercase;margin-bottom:0.4rem;"></div>
+        <h2 id="modalTitle" style="font-family:'Bebas Neue',cursive;font-size:2.5rem;letter-spacing:0.05em;line-height:1;"></h2>
+        <div id="modalYear" style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-top:0.3rem;"></div>
+        <p id="modalDesc" style="color:var(--muted);font-size:0.9rem;margin-top:0.75rem;line-height:1.6;"></p>
+        <a id="modalSpotifyLink" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;margin-top:1.25rem;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--cyan);text-decoration:none;">
+          ▶ &nbsp;OPEN ON SPOTIFY ↗
+        </a>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div id="modalEmbed" style="margin-bottom:2rem;"></div>
+      <div class="tracks-header" style="display: none;" >Tracklist</div>
+      <div id="modalTracks"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo"><span>S</span>ynth<span>B</span>eat<span>S</span>tudio</div>
+  <div class="footer-sub">Raheel Ali · Independent Artist</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a><a href="music.html">Music</a>
+    <a href="gallery.html">Gallery</a><a href="about.html">About</a>
+    <a href="contact.html">Contact</a><a href="admin.html">Admin</a>
+  </div>
+  <div class="footer-copy">© 2024 Raheel Ali / SynthBeatStudio. All rights reserved.</div>
+</footer>
+
+<script>
+  let allAlbums = [];
+
+  function filterAlbums(genre, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = genre === 'all' ? allAlbums : allAlbums.filter(a => a.genre === genre);
+    renderAlbums(filtered);
+  }
+
+  function renderAlbums(albums) {
+    const grid = document.getElementById('albumsGrid');
+    if (!albums.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.7rem;">No albums yet. <a href="admin.html" style="color:var(--cyan);">Add from Admin Panel →</a></div>`;
+      return;
+    }
+    grid.innerHTML = albums.map(album => `
+      <div class="album-card" onclick='openModal(${JSON.stringify(album).replace(/'/g, "&#39;")})'>
+        <div class="album-cover">
+          ${album.cover
+            ? `<img src="${album.cover}" alt="${album.title}">`
+            : `<div class="album-placeholder"><div class="icon">🎵</div><p>No Cover</p></div>`}
+          <div class="album-play-overlay">
+            <div class="play-circle">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="#0a0a0f"><polygon points="5,3 19,12 5,21"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="album-info">
+          <div class="album-genre">${album.genre}</div>
+          <div class="album-name">${album.title}</div>
+          <div class="album-meta">
+            <span class="album-year">${album.year}</span>
+            <span class="album-tracks-count">${album.tracks.length} tracks</span>
+          </div>
+          <p class="album-desc">${album.description}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openModal(album) {
+    document.getElementById('modalGenre').textContent = album.genre;
+    document.getElementById('modalTitle').textContent = album.title;
+    document.getElementById('modalYear').textContent = `${album.year} · ${album.tracks.length} tracks`;
+    document.getElementById('modalDesc').textContent = album.description;
+    document.getElementById('modalSpotifyLink').href = album.spotify_url || '#';
+    const coverEl = document.getElementById('modalCover');
+    coverEl.innerHTML = album.cover ? `<img src="${album.cover}" style="width:100%;height:100%;object-fit:cover;">` : '🎵';
+    const embed = document.getElementById('modalEmbed');
+    embed.innerHTML = album.spotify_embed
+      ? `<iframe style="border-radius:0;" src="${album.spotify_embed}" width="100%" height="500px" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`
+      : '';
+    document.getElementById('modalTracks').innerHTML = album.tracks.map(t => `
+      <div class="track-row">
+        <span class="track-num">${t.number}</span>
+        <span class="track-title">${t.title}</span>
+        <span class="track-dur">${t.duration}</span>
+      </div>
+    `).join('');
+    document.getElementById('albumModal').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('albumModal')) {
+      document.getElementById('albumModal').classList.remove('open');
+    }
+  }
+
+  async function init() {
+    const albums = await fetch('data/albums.json').then(r => r.json()).catch(() => []);
+    allAlbums = albums;
+    const genres = [...new Set(albums.map(a => a.genre))];
+    const filterBar = document.getElementById('filterBar');
+    genres.forEach(g => {
+      filterBar.innerHTML += `<button class="filter-btn" onclick="filterAlbums('${g}', this)">${g}</button>`;
+    });
+    renderAlbums(albums);
+  }
+  init();
+</script>
+</body>
+</html>
