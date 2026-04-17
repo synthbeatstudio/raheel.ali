@@ -226,7 +226,7 @@
 
     // social
     const socialEl = document.getElementById('socialLinks');
-    const icons = { spotify: '♪ Spotify', instagram: '◎ Instagram', youtube: '▶ YouTube', soundcloud: '☁ SoundCloud' };
+    const icons = { spotify: '♪ Spotify', instagram: '◎ Instagram', youtube: '▶ YouTube', soundcloud: '☁ TikTok' };
     Object.entries(artist.social).forEach(([key, url]) => {
       if (url && url !== '#') {
         socialEl.innerHTML += `<a href="${url}" target="_blank" class="social-btn">${icons[key] || key}</a>`;
